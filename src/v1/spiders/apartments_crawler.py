@@ -1,12 +1,13 @@
 import scrapy
-from src.common.__init__ import link_extractor
+from src.common import link_extractor
 
 
 class ApartmentsCrawlerSpider(scrapy.Spider):
     name = 'apartments_crawler'
     allowed_domains = ['www.apartments.com']
-    start_urls = ['https://www.apartments.com/fremont-ca/']
+    start_urls = ['https://www.apartments.com/fremont-ca/', 'https://www.apartments.com/livermore-ca/']
 
     def parse(self, response):
-        link_extractor(link=response.url)
+        print(f"\n\n{response.url}\n\n")
+        link_extractor(link=response.url, pg='', a=[])
         pass
