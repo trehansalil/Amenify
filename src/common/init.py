@@ -10,7 +10,7 @@ def unique_list(a):
     return k
 
 
-def link_extract(link, pg='', a=[]):
+def link_extractor(link, pg='', a=[]):
     headers = {
         'authority': 'www.apartments.com',
         #     'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
@@ -43,5 +43,5 @@ def link_extract(link, pg='', a=[]):
         print(f"{int(pages[1])+1}")
         pages = [int(pg) + 1 for pg in pages]
         for j in range(pages[0], pages[1]):
-            print(len(link_extract(link=link, pg=j, a=a)))
+            print(len(link_extractor(link=link, pg=str(j), a=a)))
     return a
