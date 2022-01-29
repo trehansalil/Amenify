@@ -1,5 +1,6 @@
 import scrapy
-from src.common import link_extractor
+from src.common.init import link_extractor
+
 
 class ApartmentsCrawlerSpider(scrapy.Spider):
     name = 'apartments_crawler'
