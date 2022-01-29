@@ -45,6 +45,3 @@ def link_extract(link, pg='', a=[]):
         for j in range(pages[0], pages[1]):
             print(len(link_extract(link=link, pg=j, a=a)))
     return a
-
-
-link_extract(link="https://www.apartments.com/fremont-ca/", pg='', a=[])
