@@ -10,11 +10,7 @@ def unique_list(a):
     return k
 
 
-def link_extract(link, pg='', a=None):
-    if a is None:
-        a = []
-
-
+def link_extract(link, pg='', a=[]):
     headers = {
         'authority': 'www.apartments.com',
         #     'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
@@ -44,10 +40,11 @@ def link_extract(link, pg='', a=None):
         a.extend(unique_list([i['href'] for i in soup.select(".property-link")]))
         print(len(a))
         pages = soup.select_one(".pageRange").get_text().lower().replace("page", "").replace("of", "").strip().split()
-
+        print(f"{int(pages[1])+1}")
         pages = [int(pg) + 1 for pg in pages]
         for j in range(pages[0], pages[1]):
-            print(len(link_extract(link=link, pg=j)))
+            print(len(link_extract(link=link, pg=j, a=a)))
     return a
 
-link_extract(link = "https://www.apartments.com/fremont-ca/", pg='', a=None)
+
+link_extract(link="https://www.apartments.com/fremont-ca/", pg='', a=[])
