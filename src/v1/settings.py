@@ -6,11 +6,15 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
+cur_dir = os.path.abspath(os.getcwd())
+exec_dir = os.path.join(cur_dir, "logs")
+PROC_LOGS_PATH = exec_dir
 
-BOT_NAME = 'tutorial'
+BOT_NAME = 'Apartments_data'
 
-SPIDER_MODULES = ['tutorial.spiders']
-NEWSPIDER_MODULE = 'tutorial.spiders'
+SPIDER_MODULES = ['src.v1.spiders']
+NEWSPIDER_MODULE = 'src.v1.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
