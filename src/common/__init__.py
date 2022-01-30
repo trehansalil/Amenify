@@ -33,3 +33,50 @@ def link_extractor(link, pg='', a=[]):
         for j in range(pages[0], pages[1]):
             print(len(link_extractor(link=link, pg=str(j), a=a)))
     return a
+
+
+# Constructor for storing the data
+def apartments_data_obj():
+    return ({
+        "link": None,
+        "name": None,
+        "primary_photo": None,
+        "backdrop": [],
+        "description": None,
+        "property_min_price": None,
+        "property_max_price": None,
+        "phone_number": None,
+        "address": None,
+        'locality': None,
+        'region': None,
+        'pin_code': None,
+        'country': None,
+        'opening_timings': [],
+        'type': None,
+        'latitude': None,
+        'longitude': None,
+        'property_type': None,
+        'pets_allowed': None,
+        "reviews": [],
+        'amenities': [],
+        'nearby_areas': [],
+        'Neighborhood_description': None,
+        'parking': [],
+        'lease_options': None,
+        "fee_details": [],
+        "pets_details": [],
+        "nearby_public_schools": [],
+        "nearby_private_schools": [],
+        "model_details": [],
+        "community_outside_image": [],
+        "community_inside_image": [],
+        "all_images": [],
+        "management_company_logo": None,
+        "leasing_periods": [],
+        "number_of_units": [],
+        "number_of_stories": [],
+        "distance_to_city_centre": None,
+        "model_name": [],
+        "rent_Details": [],
+        "sq_ft_Details": []
+    })
