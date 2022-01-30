@@ -28,5 +28,5 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
 
     def parse(self, response):
         print(f"\n\n{response.url}\n\n")
-        link_extractor(link=response.url, pg='', a=[])
+        url_list = link_extractor(link=response.url, pg='', a=[])
         pass
