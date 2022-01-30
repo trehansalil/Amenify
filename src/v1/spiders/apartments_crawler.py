@@ -29,4 +29,10 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
     def parse(self, response):
         print(f"\n\n{response.url}\n\n")
         url_list = link_extractor(link=response.url, pg='', a=[])
+        for url in url_list:
+            yield scrapy.Request(url=url, callback=self.parse_apartments)
+        pass
+
+    def parse_apartments(self, url):
+        print(f"\n\n{url}\n\n")
         pass
