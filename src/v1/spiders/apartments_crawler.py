@@ -12,14 +12,15 @@ from pydispatch import dispatcher
 from scrapy import signals
 from scrapy.utils.project import get_project_settings
 
-from src.common import link_extractor, image_extractor, apartments_data_obj, education_data_fetcher
+from src.common import link_extractor, image_extractor, education_data_fetcher
 from src.review import reviews_extractor
-from src.apartment import save_apartments_data_to_db
+from src.apartment import Apartments
 
 settings = get_project_settings()
 sleep_times = [3, 4, 5]
 context = ssl._create_unverified_context()
 
+apartments = Apartments()
 
 class ApartmentsCrawlerSpider(scrapy.Spider):
     name = 'apartments_crawler'
@@ -56,7 +57,7 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         pass
 
     def parse_apartments(self, url):
-        apartments_obj = apartments_data_obj()
+        apartments_obj = apartments.apartments_data_obj()
         link = url.url
         apartments_obj['link'] = link
 
@@ -200,6 +201,7 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
             print(f"Other stories/units Error: {e}")
 
         print(f"\n\n{link}: \n{apartments_obj}\n\n")
+        apartments.save_apartments_data_to_db(apartments_object=apartments_obj)
 
         yield apartments_obj
         pass

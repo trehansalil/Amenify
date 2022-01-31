@@ -37,45 +37,6 @@ def link_extractor(link, pg='', a=[]):
     return a
 
 
-# Apartments Data Object Constructor
-def apartments_data_obj():
-    return ({
-        "link": None,
-        "name": None,
-        "primary_image": None,
-        "backdrop": [],
-        "posters": [],
-        "photos": [],
-        "images": [],
-        "full_description": None,
-        "property_min_price": None,
-        "property_max_price": None,
-        "phone_number": None,
-        "address": None,
-        'locality': None,
-        'region': None,
-        'pin_code': None,
-        'country': None,
-        'type': None,
-        'latitude': None,
-        'longitude': None,
-        'property_type': None,
-        'pets_permitted': None,
-        "reviews": [],
-        'amenities': [],
-        'vicinity': [],
-        'neighborhood_description': None,
-        'parking': [],
-        'leasing_options': None,
-        "fee_details": [],
-        "pets_details": [],
-        "nearby_schools": [],
-        "management_company": None,
-        "property_info": [],
-        "created_on": None,
-    })
-
-
 # Image Extractor
 def awc_token_generator(link):
     headers = {
