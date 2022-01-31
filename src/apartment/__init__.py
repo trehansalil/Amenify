@@ -80,20 +80,26 @@ class Apartments(scrapy.Spider):
             "created_on": None,
         })
 
+    # Deduplication Logic for urls
+    def check_url(self, link):
+        if apartments_collection.count_documents({"link": link}) > 0:
+            return True
+
     def save_apartments_data_to_db(self, apartments_object):
-        mycol = self.apartments_collection
+        mycol = apartments_collection
         # print(mycol.find({}))
         # if mycol.find({}).count() == 0:
         #     print("Inserting new apartment data into ", mycol)
         #     mycol.insert_one(apartments_object)
         #     print("Inserted new apartment data into ", mycol)
         try:
-            if mycol.find({"link": apartments_object["link"]}).count() > 0:
+            if mycol.count_documents({"link": apartments_object["link"]}) > 0:
                 print("Apartmemts Data Already Exists\n")
                 for x in mycol.find({"link": apartments_object["link"]}):
                     existing = x
                     break
-
+                # if existing['link'] == apartments_object['link']:
+                #     continue
                 print(existing['created_on'], apartments_object['created_on'])
 
                 mycol.replace_one({"link": apartments_object["link"]}, existing)

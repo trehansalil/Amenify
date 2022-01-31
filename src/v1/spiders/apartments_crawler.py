@@ -51,15 +51,21 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         print(f"\n\n{response.url}\n\n")
         url_list = link_extractor(link=response.url, pg='', a=[])
         for enum, url in enumerate(url_list):
-            if enum > 20:
-                break
+            # if enum > 20:
+            #     break
             time.sleep(random.choice(sleep_times))
+            print(f"Enum {enum} : {url}")
+            if apartments.check_url(link=url):
+                print(f"\n\n Skipping this url: {url}\n\n")
+                continue
             yield scrapy.Request(url=url, callback=self.parse_apartments)
         pass
 
     def parse_apartments(self, url):
         apartments_obj = apartments.apartments_data_obj()
         link = url.url
+
+
         apartments_obj['link'] = link
 
         response = requests.get(link, headers=self.headers)
