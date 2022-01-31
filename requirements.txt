@@ -21,12 +21,14 @@ lxml==4.7.1
 numpy==1.22.1
 pandas==1.4.0
 parsel==1.6.0
+Pillow==9.0.0
 priority==2.0.0
 Protego==0.1.16
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
 PyDispatcher==2.0.5
+pymongo==4.0.1
 pyOpenSSL==22.0.0
 python-dateutil==2.8.2
 pytz==2021.3
