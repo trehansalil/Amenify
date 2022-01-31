@@ -55,4 +55,4 @@ class Apartments(scrapy.Spider):
         else:
             print("Inserting Movie into ", mycol)
             mycol.insert_one(apartments_object)
-            print("Inserting new appartment into ", mycol)
+            print("Inserting new apartment data into ", mycol)
