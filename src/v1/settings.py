@@ -7,6 +7,8 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
+
+DB_URI = 'mongodb://localhost/amenify_assignment'
 cur_dir = os.path.abspath(os.getcwd())
 exec_dir = os.path.join(cur_dir, "logs")
 PROC_LOGS_PATH = exec_dir
