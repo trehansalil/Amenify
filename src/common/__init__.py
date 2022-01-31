@@ -64,7 +64,7 @@ def apartments_data_obj():
         "reviews": [],
         'amenities': [],
         'vicinity': [],
-        'Neighborhood_description': None,
+        'neighborhood_description': None,
         'parking': [],
         'leasing_options': None,
         "fee_details": [],
@@ -72,6 +72,7 @@ def apartments_data_obj():
         "nearby_schools": [],
         "management_company": None,
         "property_info": [],
+        "created_on": None,
     })
 
 

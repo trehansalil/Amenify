@@ -1,21 +1,20 @@
 import json
+import random
+import ssl
+import time
+import urllib.request
 
 import requests
-import random
-import random
-import time
 import scrapy
+from PIL import Image
 from bs4 import BeautifulSoup
 from pydispatch import dispatcher
 from scrapy import signals
 from scrapy.utils.project import get_project_settings
-import ssl
-import urllib.request
-from PIL import Image
-import ssl
 
 from src.common import link_extractor, image_extractor, apartments_data_obj, education_data_fetcher
 from src.review import reviews_extractor
+from src.apartment import save_apartments_data_to_db
 
 settings = get_project_settings()
 sleep_times = [3, 4, 5]
@@ -50,7 +49,7 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         print(f"\n\n{response.url}\n\n")
         url_list = link_extractor(link=response.url, pg='', a=[])
         for enum, url in enumerate(url_list):
-            if enum>20:
+            if enum > 20:
                 break
             time.sleep(random.choice(sleep_times))
             yield scrapy.Request(url=url, callback=self.parse_apartments)
@@ -98,8 +97,8 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         # print(url)
         # print(json_resp)
 
-        apartments_obj['reviews'] = reviews_extractor(link=link)
-        apartments_obj['images'] = image_extractor(link=link)
+        # apartments_obj['reviews'] = reviews_extractor(link=link)
+        # apartments_obj['images'] = image_extractor(link=link)
 
         for img_url in apartments_obj['images']:
             req = urllib.request.urlopen(img_url, context=context)
