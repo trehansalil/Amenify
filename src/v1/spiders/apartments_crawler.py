@@ -14,6 +14,7 @@ from scrapy.utils.project import get_project_settings
 
 from src.common import link_extractor, image_extractor, education_data_fetcher
 from src.review import reviews_extractor
+from datetime import datetime
 from src.apartment import Apartments
 
 settings = get_project_settings()
@@ -53,18 +54,18 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         for enum, url in enumerate(url_list):
             # if enum > 20:
             #     break
+            if apartments.check_url(link=url):
+                print(f"\n\n Enum {enum} Skipping this url: {url}\n\n")
+                continue
             time.sleep(random.choice(sleep_times))
             print(f"Enum {enum} : {url}")
-            if apartments.check_url(link=url):
-                print(f"\n\n Skipping this url: {url}\n\n")
-                continue
+
             yield scrapy.Request(url=url, callback=self.parse_apartments)
         pass
 
     def parse_apartments(self, url):
         apartments_obj = apartments.apartments_data_obj()
         link = url.url
-
 
         apartments_obj['link'] = link
 
@@ -208,6 +209,8 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
             print(f"Other stories/units Error: {e}")
 
         print(f"\n\n{link}: \n{apartments_obj}\n\n")
+        apartments_obj['created_on'] = datetime.now()
+
         apartments.save_apartments_data_to_db(apartments_object=apartments_obj)
 
         yield apartments_obj
