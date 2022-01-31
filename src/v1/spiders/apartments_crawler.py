@@ -22,6 +22,7 @@ context = ssl._create_unverified_context()
 
 apartments = Apartments()
 
+
 class ApartmentsCrawlerSpider(scrapy.Spider):
     name = 'apartments_crawler'
     allowed_domains = ['www.apartments.com']

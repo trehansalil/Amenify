@@ -81,9 +81,13 @@ class Apartments(scrapy.Spider):
         })
 
     def save_apartments_data_to_db(self, apartments_object):
-
         mycol = self.apartments_collection
-        if mycol.find({"link": apartments_object["link"]}).count() > 0:
+        if mycol.find({}).count() == 0:
+            print("Inserting new apartment data into ", mycol)
+            mycol.insert_one(apartments_object)
+            print("Inserted new apartment data into ", mycol)
+
+        elif mycol.find({"link": apartments_object["link"]}).count() > 0:
             print("Apartmemts Data Already Exists\n")
             for x in mycol.find({"link": apartments_object["link"]}):
                 existing = x
@@ -95,6 +99,6 @@ class Apartments(scrapy.Spider):
             print('--------', existing)
             print("Apartmemts Data Updated\n")
         else:
-            print("Inserting Movie into ", mycol)
-            mycol.insert_one(apartments_object)
             print("Inserting new apartment data into ", mycol)
+            mycol.insert_one(apartments_object)
+            print("Inserted new apartment data into ", mycol)
