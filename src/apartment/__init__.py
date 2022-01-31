@@ -12,7 +12,7 @@ class Apartments(scrapy.Spider):
     start_urls = ['https://www.apartments.com']
     DB_URI = settings.get("DB_URI")
     database = MongoClient(DB_URI).get_database()
-    apartments_collection = database["apartments"]
+    apartments_collection = database["apartments_collection"]
 
     def __init__(self):
 
@@ -54,6 +54,7 @@ class Apartments(scrapy.Spider):
             "management_company": None,
             "property_info": [],
             "created_on": None,
+            "source_url": [],
         })
 
     # Deduplication Logic for urls
@@ -64,10 +65,10 @@ class Apartments(scrapy.Spider):
     def save_apartments_data_to_db(self, apartments_object):
         mycol = self.apartments_collection
         # print(mycol.find({}))
-        # if mycol.find({}).count() == 0:
-        #     print("Inserting new apartment data into ", mycol)
-        #     mycol.insert_one(apartments_object)
-        #     print("Inserted new apartment data into ", mycol)
+        if mycol.find({}).count() == 0:
+            print("Inserting new apartment data into ", mycol)
+            mycol.insert_one(apartments_object)
+            print("Inserted new apartment data into ", mycol)
         try:
             if mycol.count_documents({"link": apartments_object["link"]}) > 0:
                 print("Apartmemts Data Already Exists\n")

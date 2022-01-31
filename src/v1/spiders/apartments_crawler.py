@@ -38,6 +38,7 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
                         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                         'accept-language': 'en-US,en;q=0.9'
                         }
+        self.source_url = []
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
     def spider_opened(self, spider):
@@ -52,11 +53,10 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         print(f"\n\n{response.url}\n\n")
         url_list = link_extractor(link=response.url, pg='', a=[])
         for enum, url in enumerate(url_list):
-            # if enum > 20:
-            #     break
             if apartments.check_url(link=url):
                 print(f"\n\n Enum {enum} Skipping this url: {url}\n\n")
                 continue
+            self.source_url = [response.url]
             time.sleep(random.choice(sleep_times))
             print(f"Enum {enum} : {url}")
 
@@ -66,7 +66,7 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
     def parse_apartments(self, url):
         apartments_obj = apartments.apartments_data_obj()
         link = url.url
-
+        print(f"\n\n{self.source_url}\n\n")
         apartments_obj['link'] = link
 
         response = requests.get(link, headers=self.headers)
@@ -208,9 +208,9 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         except Exception as e:
             print(f"Other stories/units Error: {e}")
 
-        print(f"\n\n{link}: \n{apartments_obj}\n\n")
         apartments_obj['created_on'] = datetime.now()
-
+        apartments_obj['source_url'] = self.source_url
+        print(f"\n\n{link}: \n{apartments_obj}\n\n")
         apartments.save_apartments_data_to_db(apartments_object=apartments_obj)
 
         yield apartments_obj
