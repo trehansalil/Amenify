@@ -1,15 +1,25 @@
 import json
 
 import requests
+import random
+import random
+import time
 import scrapy
 from bs4 import BeautifulSoup
 from pydispatch import dispatcher
 from scrapy import signals
 from scrapy.utils.project import get_project_settings
+import ssl
+import urllib.request
+from PIL import Image
+import ssl
 
-from src.common import link_extractor, apartments_data_obj
+from src.common import link_extractor, image_extractor, apartments_data_obj, education_data_fetcher
+from src.review import reviews_extractor
 
 settings = get_project_settings()
+sleep_times = [3, 4, 5]
+context = ssl._create_unverified_context()
 
 
 class ApartmentsCrawlerSpider(scrapy.Spider):
@@ -39,7 +49,10 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
     def parse(self, response):
         print(f"\n\n{response.url}\n\n")
         url_list = link_extractor(link=response.url, pg='', a=[])
-        for url in url_list:
+        for enum, url in enumerate(url_list):
+            if enum>20:
+                break
+            time.sleep(random.choice(sleep_times))
             yield scrapy.Request(url=url, callback=self.parse_apartments)
         pass
 
@@ -53,8 +66,8 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
 
         json_resp = json.loads(soup.find("script", attrs={"type": "application/ld+json"}).text)
         apartments_obj['name'] = json_resp['about']['name'].strip()
-        apartments_obj['primary_photo'] = json_resp['about']['image'].strip()
-        apartments_obj['description'] = json_resp['about']['description'].replace("\n", "").strip()
+        apartments_obj['primary_image'] = json_resp['about']['image'].strip()
+        apartments_obj['full_description'] = json_resp['about']['description'].replace("\n", "").strip()
         try:
             apartments_obj['property_min_price'] = json_resp['about']['offers']['lowPrice']
             apartments_obj['property_max_price'] = json_resp['about']['offers']['highPrice']
@@ -78,19 +91,114 @@ class ApartmentsCrawlerSpider(scrapy.Spider):
         except Exception as e:
             print(f"Place Error: {e}")
         try:
-            apartments_obj['petsAllowed'] = json_resp['mainEntity'][0]['containsPlace']['petsAllowed']
+            apartments_obj['pets_permitted'] = json_resp['mainEntity'][0]['containsPlace']['petsAllowed']
         except Exception as e:
             print(f"Pet Error: {e}")
-        # Opening timings
-        try:
-            for i in json_resp['mainEntity'][0]['openingHoursSpecification']:
-                apartments_obj['opening_timings'].extend(
-                    [{"day": j, "opens": i['opens'], "closes": i['closes']} for j in i['dayOfWeek']])
-        except Exception as e:
-            print(f"Opening Hours Error: {e}")
             # print("fetching")
         # print(url)
         # print(json_resp)
+
+        apartments_obj['reviews'] = reviews_extractor(link=link)
+        apartments_obj['images'] = image_extractor(link=link)
+
+        for img_url in apartments_obj['images']:
+            req = urllib.request.urlopen(img_url, context=context)
+            img = Image.open(req)
+            if img.size[0] > img.size[1]:
+                apartments_obj['backdrops'].append(img_url)
+            elif img.size[0] < img.size[1]:
+                apartments_obj['posters'].append(img_url)
+            else:
+                apartments_obj['photos'].append(img_url)
+
+        # Amenities data
+        for amenities in soup.find_all("li", attrs={"class": "specInfo"})[1:]:
+            apartments_obj["amenities"].append(amenities.text.strip())
+
+        # fetching nearby areas
+        dict_value = {}
+        for contents in soup.select(".transportationDetail"):
+            row = []
+            for child in contents.find("table").children:
+                for td in child:
+                    try:
+                        alpha = [i for i in td.text.split('\n') if i and len(i) != 0]
+
+                        if alpha not in row and len(alpha) != 0:
+                            row.append(alpha)
+                    except:
+                        continue
+            dict_value.update({row[0][0]: {i[0]: i[1:] for i in row[1:]}})
+
+        apartments_obj["vicinity"].append(dict_value)
+
+        # neighborhood description
+        desc = []
+        [desc.extend(i.find_all("p")) for i in soup.find_all("div", attrs={"class": "overView"})]
+        apartments_obj["neighborhood_description"] = [i.get_text().strip() for i in desc if i.get_text().strip()]
+
+        # Parking details, Pet details, Leasing details
+        data_fetch = {i: i.find("h4").get_text() if i.find("h4") is not None else None for i in
+                      soup.select(".component-frame")}
+        for i in data_fetch.values():
+            if "Other Fees" == str(i).strip():
+                print(i)
+
+        value_fetch = [i for i in data_fetch.values()]
+        index_fetch = [i for i in data_fetch.keys()]
+        # result_fetch = {value_fetch[i]: index_fetch[i] for i in range(len(index_fetch))}
+        try:
+            keys = [i.get_text() for i in index_fetch[value_fetch.index("Parking")].select(".column")]
+            values = [i.get_text() for i in index_fetch[value_fetch.index("Parking")].select(".subTitle")]
+            result_fetch = {keys[i]: values[i] for i in range(len(keys))}
+            apartments_obj['parking'].append(result_fetch)
+        except Exception as e:
+            print(f"Parking Error: {e}")
+
+        # Leasing details
+        try:
+            lease_value = [i.get_text() for i in index_fetch[value_fetch.index("Lease Options")].select(".column")]
+            apartments_obj["leasing_options"] = lease_value
+        except Exception as e:
+            print(f"Lease Option Error: {e}")
+
+        # Fees details
+        try:
+            fee_keys = [i.get_text() for i in index_fetch[value_fetch.index("Other Fees")].select(".column")]
+            fee_values = [i.get_text() for i in index_fetch[value_fetch.index("Other Fees")].select(".column-right")]
+            fees_details = {fee_keys[i]: fee_values[i] for i in range(len(fee_keys))}
+            apartments_obj["fee_details"].append(fees_details)
+        except Exception as e:
+            print(f"Other Fees Error: {e}")
+
+        # Pet Details
+        try:
+            pet_keys = [i.get_text() for i in index_fetch[value_fetch.index("Dogs Allowed")].select(".column")]
+            pet_values = [i.get_text() for i in index_fetch[value_fetch.index("Dogs Allowed")].select(".column-right")]
+            pet_details = {pet_keys[i]: pet_values[i] for i in range(len(pet_keys))}
+            apartments_obj["pets_details"].append(pet_details)
+        except Exception as e:
+            print(f"Pet Details Error: {e}")
+
+        # fetching nearby school details
+        try:
+            for j in ["Public", "Private"]:
+                apartments_obj["nearby_schools"].append(education_data_fetcher(soup=soup, typ=j))
+        except Exception as e:
+            print(f"Education Error: {e}")
+
+        # management company
+        apartments_obj["management_company"] = soup.select_one(".pmcLogo")['src'].split('/')[-1].split('.')[0].replace(
+            '-logo', '').replace('-', ' ').title()
+
+        # Fetching the property stories and floor details
+        try:
+            stories_fetch = [i.get_text() for i in
+                             index_fetch[value_fetch.index("Property Information")].select(".column")]
+            property_data = [i for i in stories_fetch if i.count("units") or i.count("stories")]
+            apartments_obj["property_info"] = property_data
+        except Exception as e:
+            print(f"Other stories/units Error: {e}")
 
         print(f"\n\n{link}: \n{apartments_obj}\n\n")
 
