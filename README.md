@@ -1,6 +1,6 @@
 
 
-![GitHub Cards Preview](https://github.com/TheCodeMonks/TechBytes/blob/master/screenshots/nytimes_card.jpg?raw=true)
+![GitHub Cards Preview](https://docs.scrapy.org/en/latest/_images/scrapy_architecture_02.png)
 
 ## 🗞 Aparments.com Crawler Architecture
 **Apartments.com** is an Real Estate Website for the people searching 🗞 for a place to stay in the US. *Made with love ❤️ by [Salil T](https://github.com/trehansalil)*
@@ -17,4 +17,4 @@
 
 This Project uses a [***Scrapy Architecture***](https://docs.scrapy.org/en/latest/topics/architecture.html).
 
-![](https://github.com/TheCodeMonks/Notes-App/blob/master/screenshots/ANDROID%20ROOM%20DB%20DIAGRAM.jpg)
+![](https://scrapy-cluster.readthedocs.io/en/latest/_images/ArchitectureOverview.png)
